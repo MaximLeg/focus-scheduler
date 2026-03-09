@@ -171,18 +171,27 @@ def morning_notification():
 
 
 def urgent_hourly_reminder():
-    """🔴 Toutes les heures (9h→21h) — rappel des urgents."""
+    """🔴 Toutes les heures (9h→21h) — rappel des urgents à faire aujourd'hui."""
     log.info("🔴 Envoi rappels urgents horaires...")
-    subs = get_all_subscriptions()
+    subs  = get_all_subscriptions()
+    today = date.today().isoformat()
 
     for sub in subs:
-        tasks  = get_tasks_for_user(sub["user_id"])
-        urgent = [t for t in tasks if t.get("urgency") == "urgent"]
-        if not urgent:
+        tasks = get_tasks_for_user(sub["user_id"])
+
+        # Seulement les urgentes non terminées avec deadline aujourd'hui
+        urgent_today = [
+            t for t in tasks
+            if t.get("urgency") == "urgent"
+            and t.get("deadline") == today
+            and not t.get("done")
+        ]
+        if not urgent_today:
             continue
 
-        title = f"🔴 {len(urgent)} tâche(s) urgente(s) en attente"
-        body  = "\n".join(f"• {t['title']}" for t in urgent[:4])
+        nb    = len(urgent_today)
+        title = f"🔴 {nb} urgence{' restante' if nb == 1 else 's restantes'} aujourd'hui"
+        body  = "\n".join(f"• {t['title']}" for t in urgent_today)
         send_push(sub, title, body, tag="urgent-reminder", urgent=True)
 
 
