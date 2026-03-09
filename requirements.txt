@@ -1,4 +1,0 @@
-schedule==1.2.1
-requests==2.31.0
-pywebpush==2.0.0
-py-vapid==1.9.1
