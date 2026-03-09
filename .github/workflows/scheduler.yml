@@ -20,6 +20,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r scheduler/requirements.txt
 
+      - name: Debug files
+        run: |
+          echo "Root:"
+          ls -la
+          echo "Scheduler folder:"
+          ls -la scheduler || echo "scheduler folder missing"
+
       - name: Run scheduler
         env:
           SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
