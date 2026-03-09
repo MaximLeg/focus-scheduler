@@ -1,0 +1,30 @@
+name: focus. scheduler
+
+on:
+  schedule:
+    # Toutes les heures (minute 0)
+    - cron: '0 * * * *'
+  workflow_dispatch: # permet de lancer manuellement depuis GitHub
+
+jobs:
+  run-scheduler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r scheduler/requirements.txt
+
+      - name: Run scheduler
+        env:
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          VAPID_PRIVATE_KEY:    ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_PUBLIC_KEY:     ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_EMAIL:          ${{ secrets.VAPID_EMAIL }}
+        run: python scheduler/run_once.py
